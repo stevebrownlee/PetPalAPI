@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetPal.API", "PetPal.API\PetPal.API.csproj", "{BE0A4410-CAA5-4E7B-B981-69DDD9AF3829}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetPal.Tests", "PetPal.Tests\PetPal.Tests.csproj", "{C8F671D1-AF2A-44E8-B841-67F67F0A8620}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE0A4410-CAA5-4E7B-B981-69DDD9AF3829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE0A4410-CAA5-4E7B-B981-69DDD9AF3829}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE0A4410-CAA5-4E7B-B981-69DDD9AF3829}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE0A4410-CAA5-4E7B-B981-69DDD9AF3829}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8F671D1-AF2A-44E8-B841-67F67F0A8620}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8F671D1-AF2A-44E8-B841-67F67F0A8620}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8F671D1-AF2A-44E8-B841-67F67F0A8620}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8F671D1-AF2A-44E8-B841-67F67F0A8620}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
