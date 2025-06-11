@@ -1,9 +1,12 @@
+using PetPal.API.Models;
+
 namespace PetPal.API.DTOs;
 
 public class AppointmentDto
 {
     public int Id { get; set; }
     public int PetId { get; set; }
+    public bool isOwner { get; set; }
     public string PetName { get; set; }
     public int VeterinarianId { get; set; }
     public string VeterinarianName { get; set; }

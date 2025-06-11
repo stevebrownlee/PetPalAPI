@@ -165,15 +165,17 @@ public static class AppointmentEndpoints
             var isVet = user.IsInRole("Veterinarian");
             var isPetOwner = appointment.Pet.Owners.Any(po => po.UserProfileId == userProfile.Id);
 
+            var dto = mapper.Map<AppointmentDto>(appointment);
+            dto.isOwner = isPetOwner; // Add a flag to indicate if the user is the pet owner
+
             // For now, any vet can view any appointment
             // In a real application, you might want to check if this specific vet is assigned to this appointment
-
             if (!isAdmin && !isVet && !isPetOwner)
             {
                 return Results.Forbid();
             }
 
-            return Results.Ok(mapper.Map<AppointmentDto>(appointment));
+            return Results.Ok(dto);
         }).RequireAuthorization();
 
         // Create a new appointment

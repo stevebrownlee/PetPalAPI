@@ -60,32 +60,23 @@ cd petpal/server
 CREATE DATABASE petpal;
 ```
 
-2. Update the connection string in `appsettings.json` or set it as an environment variable:
-```json
-{
-  "PetPalDbConnectionString": "Host=localhost;Database=petpal;Username=yourusername;Password=yourpassword"
-}
-```
+2. Create a connection string user secret
+   ```sh
+   dotnet user-secrets init
+   dotnet user-secrets set 'PetPalDbConnectionString' 'Host=localhost;Port=5432;Username=postgres;Password=your_password;Database=PetPal'
+   ```
 
 3. Apply the database migrations:
-```bash
-cd PetPal.API
-dotnet ef database update
-```
+   ```sh
+   cd PetPal.API
+   dotnet ef database update
+   ```
 
 ### Running the API
 
-1. Navigate to the API project directory:
-```bash
-cd PetPal.API
-```
+There is a `launch.json` and `tasks.json` file already in the repostitory, so you can immediately start the program in debug mode.
 
-2. Run the application:
-```bash
-dotnet run
-```
-
-3. The API will be available at `https://localhost:7000` and `http://localhost:5000` (ports may vary based on your configuration).
+1. The API will be available at `http://localhost:5000`
 
 ## 📡 API Endpoints
 
