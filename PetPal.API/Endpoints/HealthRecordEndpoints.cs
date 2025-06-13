@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using PetPal.API.Data;
 using PetPal.API.DTOs;
 using PetPal.API.Models;
+using PetPal.API.Services;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace PetPal.API.Endpoints;
 
@@ -264,5 +266,184 @@ public static class HealthRecordEndpoints
 
             return Results.NoContent();
         }).RequireAuthorization();
+
+        // Upload document to a health record
+        app.MapPost("/healthrecords/{id}/documents", async (
+            int id,
+            IFormFile document,
+            ClaimsPrincipal user,
+            PetPalDbContext db,
+            IFileStorageService fileStorage,
+            IMapper mapper) =>
+        {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userProfile = await db.UserProfiles
+                .FirstOrDefaultAsync(up => up.IdentityUserId == userId);
+
+            if (userProfile == null)
+            {
+                return Results.NotFound("User profile not found.");
+            }
+
+            var healthRecord = await db.HealthRecords
+                .Include(hr => hr.Pet)
+                .ThenInclude(p => p.Owners)
+                .FirstOrDefaultAsync(hr => hr.Id == id);
+
+            if (healthRecord == null)
+            {
+                return Results.NotFound("Health record not found.");
+            }
+
+            // Check if the user is an admin, vet, or the primary owner of the pet
+            var isAdmin = user.IsInRole("Admin");
+            var isVet = user.IsInRole("Veterinarian");
+            var isPrimaryOwner = healthRecord.Pet.Owners.Any(po => po.UserProfileId == userProfile.Id && po.IsPrimaryOwner);
+
+            if (!isAdmin && !isVet && !isPrimaryOwner)
+            {
+                return Results.Forbid();
+            }
+
+            try
+            {
+                // Save document
+                var fileName = await fileStorage.SaveFileAsync(document, "uploads/documents");
+                var fileUrl = fileStorage.GetFileUrl(fileName, "uploads/documents");
+
+                // Update health record attachments
+                // If attachments already exist, add the new one to the list
+                List<string> attachments = new List<string>();
+
+                if (!string.IsNullOrEmpty(healthRecord.Attachments))
+                {
+                    try
+                    {
+                        attachments = JsonSerializer.Deserialize<List<string>>(healthRecord.Attachments);
+                    }
+                    catch
+                    {
+                        // If not a valid JSON array, treat as a single URL
+                        if (!string.IsNullOrEmpty(healthRecord.Attachments))
+                        {
+                            attachments.Add(healthRecord.Attachments);
+                        }
+                    }
+                }
+
+                attachments.Add(fileUrl);
+                healthRecord.Attachments = JsonSerializer.Serialize(attachments);
+                healthRecord.UpdatedAt = DateTime.UtcNow;
+
+                await db.SaveChangesAsync();
+
+                return Results.Ok(mapper.Map<HealthRecordDto>(healthRecord));
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"Error uploading document: {ex.Message}");
+            }
+        }).RequireAuthorization()
+        .DisableAntiforgery(); // Disable antiforgery for file uploads
+
+        // Upload multiple documents to a health record
+        app.MapPost("/healthrecords/{id}/documents/multiple", async (
+            int id,
+            [FromForm] IFormFileCollection documents,
+            ClaimsPrincipal user,
+            PetPalDbContext db,
+            IFileStorageService fileStorage,
+            IMapper mapper) =>
+        {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userProfile = await db.UserProfiles
+                .FirstOrDefaultAsync(up => up.IdentityUserId == userId);
+
+            if (userProfile == null)
+            {
+                return Results.NotFound("User profile not found.");
+            }
+
+            var healthRecord = await db.HealthRecords
+                .Include(hr => hr.Pet)
+                .ThenInclude(p => p.Owners)
+                .FirstOrDefaultAsync(hr => hr.Id == id);
+
+            if (healthRecord == null)
+            {
+                return Results.NotFound("Health record not found.");
+            }
+
+            // Check if the user is an admin, vet, or the primary owner of the pet
+            var isAdmin = user.IsInRole("Admin");
+            var isVet = user.IsInRole("Veterinarian");
+            var isPrimaryOwner = healthRecord.Pet.Owners.Any(po => po.UserProfileId == userProfile.Id && po.IsPrimaryOwner);
+
+            if (!isAdmin && !isVet && !isPrimaryOwner)
+            {
+                return Results.Forbid();
+            }
+
+            try
+            {
+                // Parse existing attachments
+                List<string> attachments = new List<string>();
+
+                if (!string.IsNullOrEmpty(healthRecord.Attachments))
+                {
+                    try
+                    {
+                        attachments = JsonSerializer.Deserialize<List<string>>(healthRecord.Attachments);
+                    }
+                    catch
+                    {
+                        // If not a valid JSON array, treat as a single URL
+                        if (!string.IsNullOrEmpty(healthRecord.Attachments))
+                        {
+                            attachments.Add(healthRecord.Attachments);
+                        }
+                    }
+                }
+
+                // Save each document
+                foreach (var document in documents)
+                {
+                    var fileName = await fileStorage.SaveFileAsync(document, "uploads/documents");
+                    var fileUrl = fileStorage.GetFileUrl(fileName, "uploads/documents");
+                    attachments.Add(fileUrl);
+                }
+
+                // Update health record
+                healthRecord.Attachments = JsonSerializer.Serialize(attachments);
+                healthRecord.UpdatedAt = DateTime.UtcNow;
+
+                await db.SaveChangesAsync();
+
+                return Results.Ok(mapper.Map<HealthRecordDto>(healthRecord));
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"Error uploading documents: {ex.Message}");
+            }
+        }).RequireAuthorization()
+        .DisableAntiforgery(); // Disable antiforgery for file uploads
     }
 }

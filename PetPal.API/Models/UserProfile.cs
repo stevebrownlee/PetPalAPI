@@ -13,6 +13,8 @@ public class UserProfile
     public string IdentityUserId { get; set; }
     public IdentityUser IdentityUser { get; set; }
     public List<PetOwner> OwnedPets { get; set; } = new List<PetOwner>();
+    public string ThemePreference { get; set; } = "light"; // Default theme
+    public NotificationSettings NotificationSettings { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

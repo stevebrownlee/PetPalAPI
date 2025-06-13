@@ -8,6 +8,7 @@ public class HealthRecord
     public string RecordType { get; set; } // e.g., "Vaccination", "Check-up", "Surgery", etc.
     public string Description { get; set; }
     public DateTime RecordDate { get; set; }
+    public DateTime? DueDate { get; set; } // For tracking when vaccinations are due
     public int? VeterinarianId { get; set; }
     public Veterinarian Veterinarian { get; set; }
     public string Notes { get; set; }

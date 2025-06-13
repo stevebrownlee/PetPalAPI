@@ -16,7 +16,11 @@ public class PetPalDbContext : IdentityDbContext<IdentityUser>
     public DbSet<HealthRecord> HealthRecords { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Medication> Medications { get; set; }
+    public DbSet<Weight> Weights { get; set; }
     public DbSet<Veterinarian> Veterinarians { get; set; }
+    public DbSet<FeedingSchedule> FeedingSchedules { get; set; }
+    public DbSet<CareProvider> CareProviders { get; set; }
+    public DbSet<NotificationSettings> NotificationSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -84,6 +88,27 @@ public class PetPalDbContext : IdentityDbContext<IdentityUser>
             .HasOne(m => m.Pet)
             .WithMany(p => p.Medications)
             .HasForeignKey(m => m.PetId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure Weight relationships
+        modelBuilder.Entity<Weight>()
+            .HasOne(w => w.Pet)
+            .WithMany(p => p.WeightRecords)
+            .HasForeignKey(w => w.PetId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure FeedingSchedule relationships
+        modelBuilder.Entity<FeedingSchedule>()
+            .HasOne(fs => fs.Pet)
+            .WithMany(p => p.FeedingSchedules)
+            .HasForeignKey(fs => fs.PetId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure NotificationSettings relationship
+        modelBuilder.Entity<NotificationSettings>()
+            .HasOne(ns => ns.UserProfile)
+            .WithOne(up => up.NotificationSettings)
+            .HasForeignKey<NotificationSettings>(ns => ns.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -26,3 +26,23 @@ public class UserProfileDto
     public string Phone { get; set; }
     public List<string> Roles { get; set; } = new List<string>();
 }
+
+public class UpdateUserProfileDto
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Address { get; set; }
+    public string Phone { get; set; }
+}
+
+public class ForgotPasswordDto
+{
+    public string Email { get; set; }
+}
+
+public class ResetPasswordDto
+{
+    public string Email { get; set; }
+    public string Token { get; set; }
+    public string NewPassword { get; set; }
+}

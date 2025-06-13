@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PetPal.API.Data;
 using PetPal.API.DTOs;
 using PetPal.API.Models;
+using PetPal.API.Services;
 using System.Security.Claims;
 
 namespace PetPal.API.Endpoints;
@@ -375,5 +376,78 @@ public static class PetEndpoints
 
             return Results.NoContent();
         }).RequireAuthorization();
+
+        // Upload pet photo
+        app.MapPost("/pets/{id}/photo", async (
+            int id,
+            IFormFile file,
+            ClaimsPrincipal user,
+            PetPalDbContext db,
+            IFileStorageService fileStorage,
+            IMapper mapper) =>
+        {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userProfile = await db.UserProfiles
+                .FirstOrDefaultAsync(up => up.IdentityUserId == userId);
+
+            if (userProfile == null)
+            {
+                return Results.NotFound("User profile not found.");
+            }
+
+            var pet = await db.Pets
+                .Include(p => p.Owners.Where(o => o.PetId == o.Pet.Id))
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            if (pet == null)
+            {
+                return Results.NotFound("Pet not found.");
+            }
+
+            // Check if the user is an admin or an owner of the pet
+            var isAdmin = user.IsInRole("Admin");
+            var isPetOwner = pet.Owners.Any(po => po.UserProfileId == userProfile.Id);
+
+            if (!isAdmin && !isPetOwner)
+            {
+                return Results.Forbid();
+            }
+
+            try
+            {
+                // Delete old photo if exists
+                if (!string.IsNullOrEmpty(pet.ImageUrl))
+                {
+                    // Extract filename from URL
+                    var oldFileName = Path.GetFileName(pet.ImageUrl);
+                    await fileStorage.DeleteFileAsync(oldFileName, "uploads/pets");
+                }
+
+                // Save new photo
+                var fileName = await fileStorage.SaveFileAsync(file, "uploads/pets");
+
+                // Update pet with new image URL
+                pet.ImageUrl = fileStorage.GetFileUrl(fileName, "uploads/pets");
+                pet.UpdatedAt = DateTime.UtcNow;
+
+                await db.SaveChangesAsync();
+
+                return Results.Ok(mapper.Map<PetDto>(pet));
+            }
+            catch (ArgumentException ex)
+            {
+                return Results.BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem($"Error uploading photo: {ex.Message}");
+            }
+        }).RequireAuthorization()
+        .DisableAntiforgery(); // Disable antiforgery for file uploads
     }
 }

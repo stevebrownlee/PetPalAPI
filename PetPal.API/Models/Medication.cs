@@ -13,6 +13,14 @@ public class Medication
     public string Instructions { get; set; }
     public string Prescriber { get; set; } // Name of the veterinarian who prescribed the medication
     public bool IsActive { get; set; } = true;
+
+    // Reminder settings
+    public bool ReminderEnabled { get; set; } = false;
+    public string ReminderFrequency { get; set; } // e.g., "Daily", "Every 8 hours", etc.
+    public TimeSpan? ReminderTime { get; set; } // Time of day for the reminder
+    public DateTime? LastReminderSent { get; set; }
+    public DateTime? NextReminderDue { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

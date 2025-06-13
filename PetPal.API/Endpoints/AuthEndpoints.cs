@@ -6,6 +6,8 @@ using PetPal.API.Data;
 using PetPal.API.DTOs;
 using PetPal.API.Models;
 using System.Security.Claims;
+using System.Text;
+using System.Web;
 
 namespace PetPal.API.Endpoints;
 
@@ -201,5 +203,100 @@ public static class AuthEndpoints
 
             return Results.Ok(userProfileDto);
         }).RequireAuthorization();
+
+        // Update user profile endpoint
+        app.MapPut("/auth/profile", async (
+            [FromBody] UpdateUserProfileDto updateProfileDto,
+            ClaimsPrincipal user,
+            UserManager<IdentityUser> userManager,
+            PetPalDbContext db,
+            IMapper mapper) =>
+        {
+            var identityUserId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (identityUserId == null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userProfile = await db.UserProfiles.FirstOrDefaultAsync(up => up.IdentityUserId == identityUserId);
+            if (userProfile == null)
+            {
+                return Results.NotFound("User profile not found.");
+            }
+
+            // Update the user profile
+            userProfile.FirstName = updateProfileDto.FirstName;
+            userProfile.LastName = updateProfileDto.LastName;
+            userProfile.Address = updateProfileDto.Address;
+            userProfile.Phone = updateProfileDto.Phone;
+            userProfile.UpdatedAt = DateTime.UtcNow;
+
+            await db.SaveChangesAsync();
+
+            // Return the updated user profile
+            var userProfileDto = mapper.Map<UserProfileDto>(userProfile);
+            var identityUser = await userManager.FindByIdAsync(identityUserId);
+            var roles = await userManager.GetRolesAsync(identityUser);
+            userProfileDto.Roles = roles.ToList();
+
+            return Results.Ok(userProfileDto);
+        }).RequireAuthorization();
+
+        // Forgot password endpoint
+        app.MapPost("/auth/forgot-password", async (
+            [FromBody] ForgotPasswordDto forgotPasswordDto,
+            UserManager<IdentityUser> userManager,
+            ILogger<Program> logger) =>
+        {
+            var user = await userManager.FindByEmailAsync(forgotPasswordDto.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return Results.Ok(new { message = "If your email is registered, you will receive a password reset link." });
+            }
+
+            // Generate password reset token
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Encode the token for URL safety
+            var encodedToken = HttpUtility.UrlEncode(token);
+
+            // In a real application, you would send an email with a link to reset the password
+            // For development, we'll log the token and simulate the email sending
+
+            // Create a reset link (this would be included in the email)
+            var resetLink = $"https://petpal.example.com/reset-password?email={HttpUtility.UrlEncode(forgotPasswordDto.Email)}&token={encodedToken}";
+
+            // Log the reset link (for development purposes only)
+            logger.LogInformation($"Password reset link for {forgotPasswordDto.Email}: {resetLink}");
+
+            // In a real application, you would send an email here
+            // For development, we'll just simulate it
+            logger.LogInformation($"Simulating sending password reset email to {forgotPasswordDto.Email}");
+
+            return Results.Ok(new { message = "If your email is registered, you will receive a password reset link." });
+        });
+
+        // Reset password endpoint
+        app.MapPost("/auth/reset-password", async (
+            [FromBody] ResetPasswordDto resetPasswordDto,
+            UserManager<IdentityUser> userManager) =>
+        {
+            var user = await userManager.FindByEmailAsync(resetPasswordDto.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return Results.BadRequest(new { message = "Invalid token or email." });
+            }
+
+            // Reset the password
+            var result = await userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
+            if (!result.Succeeded)
+            {
+                return Results.BadRequest(new { message = "Failed to reset password.", errors = result.Errors });
+            }
+
+            return Results.Ok(new { message = "Password has been reset successfully." });
+        });
     }
 }

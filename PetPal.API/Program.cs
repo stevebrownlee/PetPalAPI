@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PetPal.API.Data;
 using PetPal.API.Endpoints;
+using PetPal.API.Services;
+using System.IO;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -93,6 +95,15 @@ builder.Services.AddControllers()
 // Add services for API explorer
 builder.Services.AddEndpointsApiExplorer();
 
+// Add HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
+
+// Add FileStorageService
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
+// Add static files support
+builder.Services.AddDirectoryBrowser();
+
 var app = builder.Build();
 
 // Initialize the database
@@ -111,6 +122,22 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Ensure upload directories exist
+if (!Directory.Exists(Path.Combine(app.Environment.WebRootPath, "uploads")))
+{
+    Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "uploads"));
+}
+
+if (!Directory.Exists(Path.Combine(app.Environment.WebRootPath, "uploads/pets")))
+{
+    Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "uploads/pets"));
+}
+
+if (!Directory.Exists(Path.Combine(app.Environment.WebRootPath, "uploads/documents")))
+{
+    Directory.CreateDirectory(Path.Combine(app.Environment.WebRootPath, "uploads/documents"));
+}
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -125,6 +152,9 @@ app.UseCors("AllowLocalhost");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Enable serving static files
+app.UseStaticFiles();
+
 // Add a simple health check endpoint
 app.MapGet("/", () => "PetPal API is running!");
 
@@ -132,9 +162,15 @@ app.MapGet("/", () => "PetPal API is running!");
 app.MapAuthEndpoints();
 app.MapPetEndpoints();
 app.MapHealthRecordEndpoints();
-// TODO: Map other endpoints
 app.MapAppointmentEndpoints();
-// app.MapMedicationEndpoints();
+app.MapMedicationEndpoints();
+app.MapVaccinationEndpoints();
+app.MapWeightEndpoints();
+app.MapFeedingScheduleEndpoints();
+app.MapDashboardEndpoints();
+app.MapExportEndpoints();
 // app.MapVeterinarianEndpoints();
+app.MapCareProviderEndpoints();
+app.MapSettingsEndpoints();
 
 app.Run();

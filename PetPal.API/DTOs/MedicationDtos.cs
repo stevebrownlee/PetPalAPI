@@ -13,6 +13,14 @@ public class MedicationDto
     public string Instructions { get; set; }
     public string Prescriber { get; set; }
     public bool IsActive { get; set; }
+
+    // Reminder settings
+    public bool ReminderEnabled { get; set; }
+    public string ReminderFrequency { get; set; }
+    public TimeSpan? ReminderTime { get; set; }
+    public DateTime? LastReminderSent { get; set; }
+    public DateTime? NextReminderDue { get; set; }
+
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -27,6 +35,11 @@ public class MedicationCreateDto
     public DateTime? EndDate { get; set; }
     public string Instructions { get; set; }
     public string Prescriber { get; set; }
+
+    // Reminder settings
+    public bool ReminderEnabled { get; set; } = false;
+    public string ReminderFrequency { get; set; }
+    public TimeSpan? ReminderTime { get; set; }
 }
 
 public class MedicationUpdateDto
@@ -39,4 +52,29 @@ public class MedicationUpdateDto
     public string Instructions { get; set; }
     public string Prescriber { get; set; }
     public bool IsActive { get; set; }
+
+    // Reminder settings
+    public bool ReminderEnabled { get; set; }
+    public string ReminderFrequency { get; set; }
+    public TimeSpan? ReminderTime { get; set; }
+}
+
+// DTOs for reminder management
+public class MedicationReminderUpdateDto
+{
+    public bool ReminderEnabled { get; set; }
+    public string ReminderFrequency { get; set; }
+    public TimeSpan? ReminderTime { get; set; }
+}
+
+public class MedicationReminderDto
+{
+    public int MedicationId { get; set; }
+    public string MedicationName { get; set; }
+    public int PetId { get; set; }
+    public string PetName { get; set; }
+    public bool ReminderEnabled { get; set; }
+    public string ReminderFrequency { get; set; }
+    public TimeSpan? ReminderTime { get; set; }
+    public DateTime? NextReminderDue { get; set; }
 }
