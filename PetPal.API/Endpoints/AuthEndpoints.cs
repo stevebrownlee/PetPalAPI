@@ -205,7 +205,7 @@ public static class AuthEndpoints
         }).RequireAuthorization();
 
         // Update user profile endpoint
-        app.MapPut("/auth/profile", async (
+        app.MapPut("/user/profile", async (
             [FromBody] UpdateUserProfileDto updateProfileDto,
             ClaimsPrincipal user,
             UserManager<IdentityUser> userManager,
@@ -227,7 +227,12 @@ public static class AuthEndpoints
             // Update the user profile
             userProfile.FirstName = updateProfileDto.FirstName;
             userProfile.LastName = updateProfileDto.LastName;
-            userProfile.Address = updateProfileDto.Address;
+            // Use the AddressDto to update the address
+            userProfile.Address = $"" +
+                $"{updateProfileDto.Address?.Street}, " +
+                $"{updateProfileDto.Address?.City}, " +
+                $"{updateProfileDto.Address?.State}, " +
+                $"{updateProfileDto.Address?.ZipCode}";
             userProfile.Phone = updateProfileDto.Phone;
             userProfile.UpdatedAt = DateTime.UtcNow;
 

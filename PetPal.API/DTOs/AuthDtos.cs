@@ -27,11 +27,19 @@ public class UserProfileDto
     public List<string> Roles { get; set; } = new List<string>();
 }
 
+public class AddressDto
+{
+    public string Street { get; set; }
+    public string City { get; set; }
+    public string State { get; set; }
+    public string ZipCode { get; set; }
+}
+
 public class UpdateUserProfileDto
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string Address { get; set; }
+    public AddressDto Address { get; set; }
     public string Phone { get; set; }
 }
 

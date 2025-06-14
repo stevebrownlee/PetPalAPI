@@ -652,7 +652,7 @@ This document provides a comprehensive reference for all available endpoints in 
 
 You can test the API using tools like:
 
-1. **Postman**: A popular API client for sending requests and viewing responses
+1. **Yaak**: A popular API client for sending requests and viewing responses
 2. **curl**: A command-line tool for making HTTP requests
 3. **The included .http file**: Open `PetPal.API.http` in Visual Studio Code with the REST Client extension installed
 
