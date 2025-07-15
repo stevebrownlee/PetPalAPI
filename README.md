@@ -13,7 +13,7 @@ PetPal allows pet owners to store and manage detailed information about their pe
 
 The system is built with a .NET Core backend API and is designed to be used with a frontend client application (not included in this repository).
 
-## ✨ Features
+## Features
 
 - **User Authentication**: Secure registration and login system
 - **Pet Management**: Add, view, update, and delete pets
@@ -23,7 +23,7 @@ The system is built with a .NET Core backend API and is designed to be used with
 - **Appointment Scheduling**: Manage veterinary and other pet-related appointments
 - **Role-Based Access Control**: Admin and regular user roles with appropriate permissions
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Backend**: .NET 7.0, ASP.NET Core
 - **API Style**: Minimal API
@@ -33,7 +33,7 @@ The system is built with a .NET Core backend API and is designed to be used with
 - **Object Mapping**: AutoMapper
 - **Data Format**: JSON
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have the following installed:
 - [.NET 7.0 SDK](https://dotnet.microsoft.com/download/dotnet/7.0)
@@ -41,32 +41,25 @@ Before you begin, ensure you have the following installed:
 - [Git](https://git-scm.com/downloads)
 - A code editor (recommended: [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio](https://visualstudio.microsoft.com/))
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Cloning the Repository
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/petpal.git
+Clone the project to the directory of your choice, and then:
 
-# Navigate to the project directory
-cd petpal/server
+```sh
+cd pet-pal-server
 ```
 
 ### Setting Up the Database
 
-1. Create a PostgreSQL database for the project:
-```sql
-CREATE DATABASE petpal;
-```
-
-2. Create a connection string user secret
+1. Create a connection string user secret. Remember to modify it by putting your password in there before running the commands.
    ```sh
    dotnet user-secrets init
    dotnet user-secrets set 'PetPalDbConnectionString' 'Host=localhost;Port=5432;Username=postgres;Password=your_password;Database=PetPal'
    ```
 
-3. Apply the database migrations:
+2. Apply the database migrations:
    ```sh
    cd PetPal.API
    dotnet ef database update
@@ -78,7 +71,7 @@ There is a `launch.json` and `tasks.json` file already in the repostitory, so yo
 
 1. The API will be available at `http://localhost:5000`
 
-## 📡 API Endpoints
+## API Endpoints
 
 The API provides the following main endpoint groups:
 
@@ -110,42 +103,6 @@ The API provides the following main endpoint groups:
 - `PUT /appointments/{id}` - Update an appointment
 - `DELETE /appointments/{id}` - Delete an appointment
 
-## 📁 Project Structure
-
-```
-PetPal/
-├── PetPal.API/              # Main API project
-│   ├── Data/                # Database context and initialization
-│   ├── DTOs/                # Data Transfer Objects
-│   ├── Endpoints/           # API endpoint definitions
-│   ├── Helpers/             # Helper classes
-│   ├── Migrations/          # EF Core migrations
-│   ├── Models/              # Domain models
-│   └── Properties/          # Project properties
-├── PetPal.Tests/            # Test project
-└── PetPal.sln               # Solution file
-```
-
-## 🧩 Key Concepts for Beginners
-
-### What is an API?
-An API (Application Programming Interface) is a set of rules that allows different software applications to communicate with each other. In this project, the API serves as the backend that handles data storage, business logic, and authentication.
-
-### What is ASP.NET Core?
-ASP.NET Core is a cross-platform, high-performance framework for building modern, cloud-based, internet-connected applications. It's used to create the web API in this project.
-
-### What is Entity Framework Core?
-Entity Framework Core is an Object-Relational Mapping (ORM) framework that enables .NET developers to work with a database using .NET objects, eliminating the need for most of the data-access code that typically needs to be written.
-
-### What is a Minimal API?
-Minimal APIs are a simplified approach to building HTTP APIs with ASP.NET Core. They use a more concise syntax than traditional controller-based APIs, making them ideal for smaller applications or microservices.
-
-### What is PostgreSQL?
-PostgreSQL is a powerful, open-source object-relational database system that uses and extends the SQL language. It's known for its reliability, feature robustness, and performance.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
