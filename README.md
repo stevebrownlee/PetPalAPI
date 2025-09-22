@@ -25,21 +25,13 @@ The system is built with a .NET Core backend API and is designed to be used with
 
 ## Technologies Used
 
-- **Backend**: .NET 7.0, ASP.NET Core
+- **Backend**: .NET 8.0, ASP.NET Core
 - **API Style**: Minimal API
 - **Database**: PostgreSQL
 - **ORM**: Entity Framework Core
 - **Authentication**: ASP.NET Identity with cookie authentication
 - **Object Mapping**: AutoMapper
 - **Data Format**: JSON
-
-## Prerequisites
-
-Before you begin, ensure you have the following installed:
-- [.NET 7.0 SDK](https://dotnet.microsoft.com/download/dotnet/7.0)
-- [PostgreSQL](https://www.postgresql.org/download/)
-- [Git](https://git-scm.com/downloads)
-- A code editor (recommended: [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio](https://visualstudio.microsoft.com/))
 
 ## Getting Started
 
