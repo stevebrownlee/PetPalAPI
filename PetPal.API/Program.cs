@@ -138,3 +138,5 @@ app.MapAppointmentEndpoints();
 // app.MapVeterinarianEndpoints();
 
 app.Run();
+
+public partial class Program { }
